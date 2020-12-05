@@ -43,10 +43,10 @@ const SendMessage = (props) => {
     let otp = Math.floor(Math
         .random() * (maxm - minm + 1)) + minm;
 
-    
+
 
     var parsed = queryString.parse(props.location.search)
-   console.log(otp)
+    console.log(otp)
     const from = 'Vonage APIs';
     const to = users[parsed.index].phone_number;
 
@@ -56,13 +56,23 @@ const SendMessage = (props) => {
 
     const sendOtp = () => {
         let date = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '/' + mm + '/' + yyyy;
         let thisText = {
             first_name: users[parsed.index].first_name,
-            last_name : users[parsed.index].last_name,
-            Time : date,
-            otp : otp
+            last_name: users[parsed.index].last_name,
+            Date: today,
+            OTP: otp
         }
-        
+
 
         dispatch(sentMessagesAction(thisText))
 

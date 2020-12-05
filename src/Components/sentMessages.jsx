@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -25,6 +25,8 @@ const useStyles = makeStyles({
 
 const SentMessages = () => {
 
+    const newSentMessages = useSelector(state => state.sentMessages)
+
     const classes = useStyles();   // custom styles for materialUi component
 
     // const dispatch = useDispatch()
@@ -48,16 +50,17 @@ const SentMessages = () => {
 
         let jsonData = (e.target.result)
         let sentMessagesDatas = JSON.parse(jsonData)
+        
+        sentMessagesDatas.sort(function (a, b) {
+            var aa = a.Date.split('/').reverse().join(),
+                bb = b.Date.split('/').reverse().join();
+            return aa < bb ? -1 : (aa > bb ? 1 : 0);
+        });
 
-        const sortedData = sentMessagesDatas.sort((a, b) => b.DateTime - a.DateTime)
-        setSentMessagesData(sortedData)
-        // dispatch(recievedUsersInfo(userData))
+        setSentMessagesData(sentMessagesDatas)
+        
     }
 
-
-    // const userSelected = (index) => {
-    //     setCurrentlySelectedUserIndex(index)
-    // }
 
 
 
@@ -72,6 +75,8 @@ const SentMessages = () => {
             <p>Below mentioned are the lists of messages already sent, if you send a new otp to any user, comeback here to see the updated result without refreshing the page.</p>
             <input type="file" id="selectFiles" onChange={(e) => { recievedJson(e) }} /><br />
             {
+
+                 
                 (sentMessagesData == null)
                     ?
                     null
@@ -87,8 +92,9 @@ const SentMessages = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {sentMessagesData.map((row, index) => (
-                                    <TableRow key={row.name}>
+
+                                {newSentMessages.map((row, index) => (
+                                    <TableRow>
                                         <TableCell >
                                             {row.first_name}
                                         </TableCell>
@@ -96,7 +102,25 @@ const SentMessages = () => {
                                             {row.last_name}
                                         </TableCell>
                                         <TableCell align="left">
-                                            {row.DateTime}
+                                            {row.Date}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.OTP}
+                                        </TableCell>
+
+                                    </TableRow>
+                                ))}
+
+                                {sentMessagesData.map((row, index) => (
+                                    <TableRow>
+                                        <TableCell >
+                                            {row.first_name}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.last_name}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.Date}
                                         </TableCell>
                                         <TableCell align="left">
                                             {row.OTP}
