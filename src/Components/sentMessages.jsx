@@ -74,13 +74,10 @@ const SentMessages = () => {
             <h3>Lists of Sent Messages</h3>
             <p>Below mentioned are the lists of messages already sent, if you send a new otp to any user, comeback here to see the updated result without refreshing the page.</p>
             <input type="file" id="selectFiles" onChange={(e) => { recievedJson(e) }} /><br />
-            {
+            
 
                  
-                (sentMessagesData == null)
-                    ?
-                    null
-                    :
+                
                     <TableContainer component={Paper}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
@@ -110,8 +107,17 @@ const SentMessages = () => {
 
                                     </TableRow>
                                 ))}
+                                {
+                            (sentMessagesData == null)
+                                ?
+                                null
+                                :
 
-                                {sentMessagesData.map((row, index) => (
+                                
+
+                                
+                      
+                                sentMessagesData.map((row, index) => (
                                     <TableRow>
                                         <TableCell >
                                             {row.first_name}
@@ -127,13 +133,13 @@ const SentMessages = () => {
                                         </TableCell>
 
                                     </TableRow>
-                                ))}
+                                ))} 
                             </TableBody>
                         </Table>
                     </TableContainer>
 
 
-            }
+            
         </div>
 
 
