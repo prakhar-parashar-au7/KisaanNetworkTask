@@ -56,9 +56,9 @@ const SendMessage = (props) => {
 
     const sendOtp = () => {
         let date = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth() + 1;
-        var yyyy = today.getFullYear();
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
         if (dd < 10) {
             dd = '0' + dd;
         }
