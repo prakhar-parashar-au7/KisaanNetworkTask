@@ -1,0 +1,19 @@
+import React from 'react';
+
+const Adduser = () => {
+
+    const recievedJson = () => {
+        
+    }
+   
+   return(
+       <>
+
+       <input type="file" id="selectFiles" value="Import" onChange = {recievedJson}/><br />
+       </>
+
+   )
+
+
+
+}
