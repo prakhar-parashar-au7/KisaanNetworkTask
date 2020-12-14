@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -11,6 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
 import { recievedUsersInfo } from './../Redux/Actions'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 
 
 const useStyles = makeStyles({
@@ -25,42 +26,29 @@ const useStyles = makeStyles({
 
 const SentMessages = () => {
 
-    const newSentMessages = useSelector(state => state.sentMessages)
+    // const newSentMessages = useSelector(state => state.sentMessages)
 
     const classes = useStyles();   // custom styles for materialUi component
 
-    // const dispatch = useDispatch()
-
-    const fr = new FileReader();
+    
 
     const [sentMessagesData, setSentMessagesData] = React.useState(null)
+    const [newSentMessages, setNewSentMessages] = React.useState(null)
 
-    // event handler for when user uploads a json file 
-    const recievedJson = (e) => {
-        console.log("hi")
-        const files = e.target.files[0]
-        fr.readAsText(files)
-
-        console.log(files)
-    }
+    
 
 
-    // fileReader onload function(asynchronus) for when it completes reading the file   
-    fr.onload = function (e) {
+  
+   
 
-        let jsonData = (e.target.result)
-        let sentMessagesDatas = JSON.parse(jsonData)
-        
-        sentMessagesDatas.sort(function (a, b) {
-            var aa = a.Date.split('/').reverse().join(),
-                bb = b.Date.split('/').reverse().join();
-            return aa < bb ? -1 : (aa > bb ? 1 : 0);
-        });
-
-        setSentMessagesData(sentMessagesDatas)
-        
-    }
-
+    useEffect(()=> {
+         axios({
+             method : "get",
+             url: "https://boiling-reaches-91818.herokuapp.com/getMessages",
+         }).then((res) => {
+             setNewSentMessages(res.data[0].messages.reverse())
+         })
+    }, [])
 
 
 
@@ -72,25 +60,23 @@ const SentMessages = () => {
 
         <div>
             <h3>Lists of Sent Messages</h3>
-            <p>Below mentioned are the lists of messages already sent, if you send a new otp to any user, comeback here to see the updated result without refreshing the page.</p>
-            <input type="file" id="selectFiles" onChange={(e) => { recievedJson(e) }} /><br />
+          
             
 
-                 
-                
+             
                     <TableContainer component={Paper}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell><h4>First Name</h4></TableCell>
                                     <TableCell align="left"><h4>Last Name</h4></TableCell>
-                                    <TableCell align="left"><h4>Time</h4></TableCell>
+                                    <TableCell align="left"><h4>Date</h4></TableCell>
                                     <TableCell align="left"><h4>OTP</h4></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-
-                                {newSentMessages.map((row, index) => (
+                               
+                                 { newSentMessages && newSentMessages.map((row, index) => (
                                     <TableRow>
                                         <TableCell >
                                             {row.first_name}
@@ -136,7 +122,7 @@ const SentMessages = () => {
                                 ))} 
                             </TableBody>
                         </Table>
-                    </TableContainer>
+                    </TableContainer> 
 
 
             

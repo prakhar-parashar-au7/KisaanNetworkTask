@@ -14,6 +14,8 @@ import Paper from '@material-ui/core/Paper';
 import { Link } from 'react-router-dom'
 import Nexmo from 'nexmo'
 import { sentMessagesAction } from './../Redux/Actions'
+import './Homestyles.css'
+import axios from 'axios'
 
 const nexmo = new Nexmo({
     apiKey: "13e900bd",
@@ -55,58 +57,72 @@ const SendMessage = (props) => {
 
 
     const sendOtp = () => {
-        let date = new Date();
-        var dd = date.getDate();
-        var mm = date.getMonth() + 1;
-        var yyyy = date.getFullYear();
-        if (dd < 10) {
-            dd = '0' + dd;
-        }
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-        var today = dd + '/' + mm + '/' + yyyy;
-        let thisText = {
-            first_name: users[parsed.index].first_name,
-            last_name: users[parsed.index].last_name,
-            Date: today,
-            OTP: otp
-        }
 
 
-        dispatch(sentMessagesAction(thisText))
+        // let text = `Hi. Your OTP is: ${otp}`
 
-        let text = `Hi. Your OTP is: ${otp}`
-        nexmo.message.sendSms(from, to, text);
-        setOtpSent(true)
+        // const sendData = JSON.stringify({
+        //     to: users[parsed.index].phone_number,
+        //     body: `Hi. Your OTP is: ${otp}`
+        // })
+        console.log("react")
+        axios({
+            method: "post",
+            url: "https://boiling-reaches-91818.herokuapp.com/api/messages",
+            data: {
+                to: users[parsed.index].phone_number,
+                body: `Hi, ${users[parsed.index].first_name}.Your OTP from Prakhar is : ${otp}`
+            }
+        })
+            .then(res => {
+                console.log(res)
+                if (res.data.success) {
+                    let date = new Date();
+                    var dd = date.getDate();
+                    var mm = date.getMonth() + 1;
+                    var yyyy = date.getFullYear();
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    var today = dd + '/' + mm + '/' + yyyy;
+                    let thisText = {
+                        first_name: users[parsed.index].first_name,
+                        last_name: users[parsed.index].last_name,
+                        Date: today,
+                        OTP: otp
+                    }
+
+
+                    dispatch(sentMessagesAction(thisText))
+                    axios({
+                        method : "post",
+                        url: "https://boiling-reaches-91818.herokuapp.com/messageSent",
+                        data : {
+                            messages : thisText
+                        }
+                    })
+                    setOtpSent(true)
+
+                }
+            })
+
+
+        
+
 
     }
 
 
     return (
         <>
-            <TableContainer component={Paper}>
-                <Table className={classes.table} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell style={{ width: 200 }}><h4>First Name</h4></TableCell>
-                            <TableCell align="left"><h4>Last Name</h4></TableCell>
-                            <TableCell align="left"><h4>Phone Number</h4></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell style={{ width: 200 }}><h4>{users[parsed.index].first_name}</h4></TableCell>
-                            <TableCell align="left"><h4>{users[parsed.index].last_name}</h4></TableCell>
-                            <TableCell align="left">{users[parsed.index].phone_number}</TableCell>
+            <div id="sendMessage">
 
 
-                        </TableRow>
-
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
+                Sending this message to &nbsp; &nbsp; <div style={{ color: "#F78888" }}>{users[parsed.index].first_name} &nbsp;{users[parsed.index].last_name}</div>&nbsp;&nbsp; at &nbsp;&nbsp;<div style={{ color: "#F78888" }}>{users[parsed.index].phone_number}</div>
+            </div>
             <br></br><br></br><br></br>
 
             {(otpSent == false) ? <div style={{ textAlign: 'center' }}>
@@ -120,10 +136,17 @@ const SendMessage = (props) => {
                 />
                 <div style={{ textAlign: 'center', marginTop: "40px" }}>
                     <Button color="primary" variant="contained" onClick={sendOtp}> Send Otp</Button>
+                    <br></br><br></br>
+                    <Link to="/" style={{ textDecoration: "none" }}><Button color="primary" variant="contained">Go Home</Button></Link>
                 </div>
             </div>
                 :
-                <p>The otp has been sent</p>}
+                <div style={{ marginLeft: "600px" }}>
+                    <img src="https://images.vexels.com/media/users/3/157931/isolated/preview/604a0cadf94914c7ee6c6e552e9b4487-curved-check-mark-circle-icon-by-vexels.png" height="50px" width="50px"></img>
+                    <p>The otp has been sent</p>
+                    <Link to="/" style={{ textDecoration: "none" }}><Button color="primary" variant="contained">Go Home</Button></Link>
+                </div>
+            }
 
         </>
     )

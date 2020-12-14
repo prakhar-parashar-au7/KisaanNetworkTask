@@ -1,9 +1,9 @@
 import { createStore, compose } from 'redux'
 
 const initialState = {
-    users: {},
-    sentMessages : []
-    
+    users: [],
+    sentMessages: []
+
 }
 
 
@@ -17,9 +17,18 @@ const userReducer = (state = initialState, action) => {
                 ...state, users: action.payload.users
             }
 
+
+        case ("NEW_USER"):
+            console.log("newUserReducer")
+            console.log("hi", action.payload.newUser)
+            return {
+                ...state, users: [action.payload.newUser, ...state.users]
+
+            }
+
         case ("SENT_MESSAGE"):
             return {
-                ...state, sentMessages : [ action.payload.sentMessage,...state.sentMessages ]
+                ...state, sentMessages: [action.payload.sentMessage, ...state.sentMessages]
             }
 
         default:
