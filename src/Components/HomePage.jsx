@@ -27,6 +27,7 @@ import './Homestyles.css'
 
 const drawerWidth = 240;
 
+// custom styles for Material ui components 
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -92,11 +93,21 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+// Main component 
+
 const HomePage = () => {
 
+    // states used in component and dependencies 
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [contacts, setContacts] = React.useState(false)
+    const [messages, setMessages] = React.useState(false)
+
+
+
+    // functions to set states to true and false accordingly when user is trying to open or close the drawer 
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -107,12 +118,13 @@ const HomePage = () => {
     };
 
 
-    const [contacts, setContacts] = React.useState(false)
-    const [messages, setMessages] = React.useState(false)
+
 
     return (
         <div>
 
+
+            {/* Navbar display in the homepage (material ui component) */}
 
             <AppBar
                 position="fixed"
@@ -138,6 +150,7 @@ const HomePage = () => {
                 </Toolbar>
             </AppBar>
 
+            {/* Drawer which contains navigation buttons to display contacts and messages  */}
 
             <Drawer
                 variant="permanent"
@@ -166,8 +179,8 @@ const HomePage = () => {
 
                         <ListItemIcon>
                             <Tooltip title="Contacts">
-                                <img src="https://img.icons8.com/plasticine/100/000000/contacts.png" width="50px" height="50px"/>
-                                
+                                <img src="https://img.icons8.com/plasticine/100/000000/contacts.png" width="50px" height="50px" />
+
                             </Tooltip>
                         </ListItemIcon>
                         <ListItemText primary="Contacts" />
@@ -179,7 +192,7 @@ const HomePage = () => {
 
                         <ListItemIcon>
                             <Tooltip title="Messages">
-                                <img src="https://img.icons8.com/fluent/48/000000/new-message.png" width="45px" height="45px"/>
+                                <img src="https://img.icons8.com/fluent/48/000000/new-message.png" width="45px" height="45px" />
                             </Tooltip>
                         </ListItemIcon>
                         <ListItemText primary="Messages" />
@@ -190,12 +203,16 @@ const HomePage = () => {
             </Drawer>
 
 
+            {/* Conditionally rendering contacts component if contact button is clicked in the drawer */}
 
             {contacts ?
                 <div id="content">
                     <AddUsers />
                 </div>
                 : messages ?
+
+                    //  Conditionally rendering sent messages  component if message button is clicked in the drawer 
+
                     <div id="content">
                         <SentMessages />
                     </div>
@@ -214,8 +231,7 @@ const HomePage = () => {
 
             }
 
-            {/* 
-                <SentMessages /> */}
+
         </div>
 
     )

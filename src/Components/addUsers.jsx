@@ -18,6 +18,7 @@ import Box from '@material-ui/core/Box';
 import Popover from '@material-ui/core/Popover';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import axios from 'axios'
+import Spinner from '@material-ui/core/CircularProgress'
 
 
 
@@ -38,28 +39,38 @@ const useStyles = makeStyles({
 // Main Component
 
 const Adduser = () => {
-   
+
     // using all the dependencies, initializing hooks 
 
-    const classes = useStyles();   
+    const classes = useStyles();
 
     const dispatch = useDispatch()
 
     const fr = new FileReader();
 
     const usersData = useSelector(state => state.users)
-    
+
 
     // states used in the component 
 
     const [userData, setUserData] = React.useState(null)
     const [currentlySelectedUserIndex, setCurrentlySelectedUserIndex] = React.useState(null)
     const [addUser, setAddUser] = React.useState(false)
+    const [newFirstName, setNewFirstName] = useState("")
+    const [newLastName, setNewLastName] = useState("")
+    const [newPhoneNo, setNewPhoneNo] = useState("")
+    const [first_name, setFirstName] = useState("")
+    const [last_name, setLastName] = useState("")
+    const [phone_number, setPhoneNo] = useState("")
+    const [currentlyEditingIndex, setCurrentlyEditingIndex] = useState(-1)
+    const [spinner, setSpinner] = useState(false)
 
 
     useEffect(() => {
         setUserData(usersData)
     }, [])
+
+
 
 
 
@@ -71,6 +82,8 @@ const Adduser = () => {
 
         console.log(files)
     }
+
+
 
 
     // fileReader onload function(asynchronus) for when it completes reading the file   
@@ -85,32 +98,11 @@ const Adduser = () => {
     }
 
 
-    const userSelected = (index) => {
-        setCurrentlySelectedUserIndex(index)
-    }
-
-
-    const [newFirstName, setNewFirstName] = useState("")
-    const [newLastName, setNewLastName] = useState("")
-    const [newPhoneNo, setNewPhoneNo] = useState("")
-
-
-
-    const [first_name, setFirstName] = useState("")
-    const [last_name, setLastName] = useState("")
-    const [phone_number, setPhoneNo] = useState("")
-    const [currentlyEditingIndex, setCurrentlyEditingIndex] = useState(-1)
 
 
 
 
-
-
-
-
-
-
-
+    // functions to handle onchange events when new user is being added
 
     const newFirstNameChange = (e) => {
         setNewFirstName(e.target.value)
@@ -121,15 +113,20 @@ const Adduser = () => {
     }
 
 
-
     const newPhoneNoChange = (e) => {
         setNewPhoneNo(e.target.value)
 
     }
 
+
+    // to create an object with correct fields from user inputs 
+
     const createData = (newFirstName, newLastName, newPhoneNo) => {
         return { first_name: newFirstName, last_name: newLastName, phone_number: newPhoneNo };
     }
+
+
+    // to add a new user when clicked on save button 
 
     const saveNewUser = () => {
         const newUser = createData(newFirstName, newLastName, newPhoneNo)
@@ -143,7 +140,7 @@ const Adduser = () => {
     }
 
 
-
+    // functions to handle on change events when user is editing a row
     const firstNameChange = (e) => {
         setFirstName(e.target.value)
         console.log(e.target.value)
@@ -158,13 +155,16 @@ const Adduser = () => {
     }
 
 
-
+    //  function to change states based on the row that user is currently editing, so as to show textfields for user to edit values in
     const currentlyEditing = (index) => {
         setCurrentlyEditingIndex(index)
         setFirstName(usersData[index].first_name)
         setLastName(usersData[index].last_name)
         setPhoneNo(usersData[index].phone_number)
     }
+
+
+    // saving edited values     
 
     const saveEditedUser = (index) => {
         const newUsersData = usersData
@@ -180,6 +180,9 @@ const Adduser = () => {
 
     }
 
+
+    // deleting a row based on index taken from user when he clicks the button delete in a particular row     
+
     const deleteThis = (index) => {
         console.log("hi")
         const newUsersData = usersData
@@ -190,8 +193,10 @@ const Adduser = () => {
 
     }
 
+    // axios request to backend server to get the users data already stored in the database 
 
     useEffect(() => {
+        setSpinner(true)
         axios({
             method: "get",
             url: "https://boiling-reaches-91818.herokuapp.com/getUsers"
@@ -199,12 +204,15 @@ const Adduser = () => {
             console.log(res)
             setUserData(res.data[0].users)
             dispatch(recievedUsersInfo(res.data[0].users))
+            setSpinner(false)
         })
 
 
 
     }, [])
 
+
+    // utility function to send requests to backend servers 
 
     const sendUser = (users) => {
         axios({
@@ -224,7 +232,7 @@ const Adduser = () => {
 
 
         <div>
-
+            {/*  top most div to show buttons to add users and uploading json files  */}
 
             <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", marginBottom: "30px", marginLeft: "140px" }}>
                 <div>
@@ -240,6 +248,10 @@ const Adduser = () => {
             </div>
 
 
+            {/* Material Ui table to show users data */}
+            {
+                (spinner) ? <div style={{marginLeft : "500px", marginTop : "150px"}}><Spinner/></div>
+             : 
             <TableContainer component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                     <TableHead>
@@ -261,6 +273,8 @@ const Adduser = () => {
                     <TableBody>
                         {
                             (addUser) ?
+
+                                // conditionally rendering empty textfields if user has clicked on add new user button
 
                                 <TableRow>
                                     <TableCell component="th" scope="row">
@@ -306,7 +320,7 @@ const Adduser = () => {
 
                                 : null}
 
-
+                        {/* user data  */}
                         {usersData.map((row, index) => (
                             <TableRow key={row.name}>
                                 <TableCell component="th" scope="row">
@@ -320,6 +334,8 @@ const Adduser = () => {
                                 <TableCell component="th" scope="row">
                                     {
                                         (currentlyEditingIndex == index) ?
+
+                                            // conditionally rendering textfield with default values as previous values if user is trying to edit a particular field 
                                             <TextField
                                                 id="outlined-textarea"
                                                 label="First Name"
@@ -343,7 +359,10 @@ const Adduser = () => {
                                                                 {row.first_name}
 
                                                             </div>
-                                                            {/* </Button> */}
+
+
+                                                            {/* Popover to display user information and send message button when user clicks on a particular name */}
+
                                                             <Popover
                                                                 {...bindPopover(popupState)}
                                                                 anchorOrigin={{
@@ -373,13 +392,7 @@ const Adduser = () => {
 
 
 
-                                                {/* <Link to={`/userInfo?index=${index}`} style={{textDecoration : "none"}}> 
-                                                <div className="name">
-                                                    
-                                                    {row.first_name}
-                                                    
-                                                </div>
-                                                </Link> */}
+
 
                                             </>
                                     }
@@ -488,6 +501,7 @@ const Adduser = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+}
 
 
         </div>

@@ -16,11 +16,8 @@ import Nexmo from 'nexmo'
 import { sentMessagesAction } from './../Redux/Actions'
 import './Homestyles.css'
 import axios from 'axios'
+import Spinner from '@material-ui/core/CircularProgress'
 
-const nexmo = new Nexmo({
-    apiKey: "13e900bd",
-    apiSecret: "mPdutaFAgG9IkjbL"
-})
 
 const useStyles = makeStyles({
     table: {
@@ -31,6 +28,8 @@ const useStyles = makeStyles({
 
 const SendMessage = (props) => {
 
+    // dependecies, initializing hooks, setting states of the component
+
     const classes = useStyles();
 
     const dispatch = useDispatch();
@@ -38,8 +37,12 @@ const SendMessage = (props) => {
     const users = useSelector(state => state.users)
 
     const [otpSent, setOtpSent] = React.useState(false)
+    const [spinner, setSpinner] = React.useState(false)
+
+
 
     // generating Otp
+
     var minm = 10000;
     var maxm = 99999;
     let otp = Math.floor(Math
@@ -54,18 +57,13 @@ const SendMessage = (props) => {
 
 
 
-
+    // function to send the otp generated to backend from where it will be sent to user's number 
 
     const sendOtp = () => {
 
-
-        // let text = `Hi. Your OTP is: ${otp}`
-
-        // const sendData = JSON.stringify({
-        //     to: users[parsed.index].phone_number,
-        //     body: `Hi. Your OTP is: ${otp}`
-        // })
         console.log("react")
+        setOtpSent(true)
+        setSpinner(true)
         axios({
             method: "post",
             url: "https://boiling-reaches-91818.herokuapp.com/api/messages",
@@ -77,6 +75,9 @@ const SendMessage = (props) => {
             .then(res => {
                 console.log(res)
                 if (res.data.success) {
+
+                    //  adding date to the otp being sent, to store it in sent messages 
+                    setSpinner(false)
                     let date = new Date();
                     var dd = date.getDate();
                     var mm = date.getMonth() + 1;
@@ -95,22 +96,23 @@ const SendMessage = (props) => {
                         OTP: otp
                     }
 
+                    // sending the newly sent message to backend to store it in database 
 
                     dispatch(sentMessagesAction(thisText))
                     axios({
-                        method : "post",
+                        method: "post",
                         url: "https://boiling-reaches-91818.herokuapp.com/messageSent",
-                        data : {
-                            messages : thisText
+                        data: {
+                            messages: thisText
                         }
                     })
-                    setOtpSent(true)
+                   
 
                 }
             })
 
 
-        
+
 
 
     }
@@ -141,6 +143,8 @@ const SendMessage = (props) => {
                 </div>
             </div>
                 :
+                (spinner) ? <div style={{ marginLeft: "600px", marginTop: "100px" }}><Spinner /></div> 
+                : 
                 <div style={{ marginLeft: "600px" }}>
                     <img src="https://images.vexels.com/media/users/3/157931/isolated/preview/604a0cadf94914c7ee6c6e552e9b4487-curved-check-mark-circle-icon-by-vexels.png" height="50px" width="50px"></img>
                     <p>The otp has been sent</p>
